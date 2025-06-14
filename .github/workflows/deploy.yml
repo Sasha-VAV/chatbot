@@ -46,7 +46,7 @@ jobs:
     
     - name: Deploy to server
       run: |
-        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+        ssh -o HostKeyAlgorithms=+ssh-rsa ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
         cd ~/git/chatbot
         git pull origin main
         docker-compose down
