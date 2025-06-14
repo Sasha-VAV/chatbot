@@ -1,7 +1,53 @@
-from fastapi import FastAPI, HTTPException
+import time
+
+from fastapi import FastAPI, HTTPException, Request
+from prometheus_client import REGISTRY, Counter, Histogram, generate_latest
 from pydantic import BaseModel, ValidationError, field_validator
+from starlette.responses import Response
 
 app = FastAPI()
+
+# METRICS
+REQUEST_COUNT = Counter(
+    "http_requests_total",
+    "Total HTTP Requests",
+    ["method", "endpoint", "http_status"],
+)
+
+REQUEST_LATENCY = Histogram(
+    "http_request_duration_seconds",
+    "HTTP Request Latency",
+    ["method", "endpoint"],
+)
+
+VALIDATION_ERRORS = Counter(
+    "validation_errors_total", "Total validation errors", ["endpoint"]
+)
+
+
+@app.middleware("http")
+async def monitor_requests(request: Request, call_next):
+    start_time = time.time()
+    method = request.method
+    endpoint = request.url.path
+    try:
+        response = await call_next(request)
+    except Exception:
+        REQUEST_COUNT.labels(method, endpoint, 500).inc()
+
+    duration = time.time() - start_time
+    REQUEST_LATENCY.labels(method, endpoint).observe(duration)
+    REQUEST_COUNT.labels(method, endpoint, response.status_code).inc()
+
+    if response.status_code == 422:
+        VALIDATION_ERRORS.labels(endpoint).inc()
+
+    return response
+
+
+@app.get("/metrics")
+async def metrics():
+    return Response(generate_latest(REGISTRY), media_type="text/plain")
 
 
 class Item(BaseModel):
