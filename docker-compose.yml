@@ -1,0 +1,23 @@
+services:
+  backend:
+    build:
+      context: backend
+    command: fastapi run backend/server.py
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 1
+      start_period: 5s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: frontend
+    env_file:
+      - .env
+    command: python3 frontend/tg_bot.py
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
