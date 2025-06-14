@@ -9,6 +9,7 @@ Roadmap:
    4. Docker
    5. tests + docker healthcheck
    6. monitoring
+   7. github package, tags
 2. Advancements
    1. sessions
    2. redis + postgres
