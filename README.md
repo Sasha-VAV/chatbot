@@ -1,14 +1,14 @@
 # chatbot
 
 Roadmap:
+
 1. Build
    1. tg bot
    2. controller
    3. CI/CD
    4. Docker
    5. tests + docker healthcheck
-   6. speed metrics
-   7. monitoring
+   6. monitoring
 2. Advancements
    1. sessions
    2. redis + postgres
