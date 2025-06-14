@@ -2,12 +2,21 @@ services:
   backend:
     build:
       context: backend
+      target: production
     command: fastapi run backend/server.py
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "from http.client import HTTPConnection; conn =
+          HTTPConnection('127.0.0.1', 8000); conn.request('GET', '/health');
+          exit(0) if conn.getresponse().status == 200 else exit(1)",
+        ]
       interval: 30s
       timeout: 10s
-      retries: 1
+      retries: 3
       start_period: 5s
     restart: unless-stopped
 
