@@ -26,6 +26,7 @@ jobs:
     - name: Run tests
       run: |
         cd backend
+        uv pip install pytest . --system
         pytest tests/ -v
 
   deploy:
