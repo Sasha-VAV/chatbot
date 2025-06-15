@@ -1,5 +1,11 @@
 # chatbot
 
+# How to launch
+```shell
+echo "TG_BOT_TOKEN=<actual_token>" >> .env
+docker-compose up -d --build
+```
+
 Roadmap:
 
 1. Build
